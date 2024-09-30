@@ -1,0 +1,127 @@
+﻿@page "/crossword"
+@using CrosswordsWA.Models.Crossword
+
+<PageTitle>Crossword</PageTitle>
+
+<p role="status">Game status: @gameStage</p>
+
+<div class="container">
+    <div class="row pb-2">
+        <div class="col-auto flex-row input-group">
+            <button class="btn btn-primary" @onclick="RestartButtonClicked">@restartButtonTitle</button>
+            <select class="form-select w-auto" style="margin-left: 5px;" aria-label="Select size">
+                <option selected>Select size</option>
+                <option value="1">10x10</option>
+                <option value="2">15x15</option>
+                <option value="3">20x20</option>
+                <option value="4">25x25</option>
+                <option value="5">30x30</option>
+            </select>
+            <select class="form-select w-auto" aria-label="Translation mode">
+                <option selected>Translation mode</option>
+                <option value="1">Word</option>
+                <option value="2">Definition</option>
+            </select>
+            <select class="form-select w-auto" aria-label="Words language">
+                <option selected>Words language</option>
+                <option value="1">English</option>
+                <option value="2">Russain</option>
+            </select>
+            <select class="form-select w-auto" aria-label="Translation language">
+                <option selected>Translation language</option>
+                <option value="1">English</option>
+                <option value="2">Russain</option>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm col-12">
+
+            @for(var r = 0; r < charCells.Length; r++)
+            {
+                <div class="row">
+                    <div class="col-sm col-9">
+                        <div class="cross-row">
+                        @foreach(var charCell in charCells[r])
+                        {
+                                <div class="cross-cell @(charCell.ContainsLetter ? "contains-letter-cell" : "contains-no-letter-cell")">
+                                    @if (charCell.WordStart)
+                                    {
+                                        @charCell.WordNumberInList
+                                    }
+                                </div>
+                        }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+
+    enum GameStage
+    {
+        NOT_STARTED = 1,
+        IN_PROCESS = 2,
+        FINISHED = 3
+    }
+
+    private string restartButtonTitle = "Start new game";
+    private GameStage gameStage = GameStage.NOT_STARTED;
+
+    private CharCell[][] charCells = new CharCell[0][];
+
+    private void ShowOptionsClicked()
+    {
+
+    }
+
+    private void RestartButtonClicked()
+    {
+        switch (gameStage)
+        {
+            case GameStage.NOT_STARTED:
+                restartButtonTitle = "Game started!";
+                charCells = GetWordsForCrossword();
+                gameStage = GameStage.IN_PROCESS;
+                break;
+            case GameStage.IN_PROCESS:
+                restartButtonTitle = "Game finished!";
+                gameStage = GameStage.FINISHED;
+                break;
+            case GameStage.FINISHED:
+                restartButtonTitle = "Start new game!";
+                gameStage = GameStage.NOT_STARTED;
+                charCells = new CharCell[0][];
+                break;
+        }
+    }
+
+    private static CharCell[][] GetWordsForCrossword()
+    {
+        var res = new CharCell[15][];
+        int fakeWordLastNumber = 0;
+        for(int i = 0; i <= 14; i++)
+        {
+            res[i] = new CharCell[15];
+            for(var j = 0; j <= 14; j++)
+            {
+                var wordStart = new Random().Next(16) == 5;
+                if (wordStart){
+                    fakeWordLastNumber++;
+                }
+                var containsChar = new Random().Next(4) == 3;
+                res[i][j] = new CharCell
+                {
+                    RealLetter = (char)i,
+                    WordStart = wordStart,
+                    WordNumberInList = wordStart ? fakeWordLastNumber : null,
+                    ContainsLetter = wordStart || containsChar
+                };
+            }
+        }
+        return res;
+    }
+}

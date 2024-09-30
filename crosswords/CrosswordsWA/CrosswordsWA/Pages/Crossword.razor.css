@@ -1,0 +1,29 @@
+﻿.defenitions-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.defenitions-block div {
+    background-color: azure;
+    border: 1px solid black;
+}
+
+.cross-cell {
+    border: 1px solid black;
+    padding: 2px;
+    height: 2rem;
+    width: 2rem;
+}
+
+.cross-row {
+    display:flex;
+    flex-direction: row;
+}
+
+.contains-letter-cell:hover {
+    background-color: aqua;
+}
+
+.contains-no-letter-cell {
+    background-color: black;
+}
