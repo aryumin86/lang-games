@@ -27,3 +27,11 @@
 .contains-no-letter-cell {
     background-color: black;
 }
+
+.options-container select {
+    margin-left: 6px;
+    margin-right: 6px;
+}
+.options-container button {
+    margin-right: 6px;
+}

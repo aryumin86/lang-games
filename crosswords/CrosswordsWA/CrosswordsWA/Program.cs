@@ -1,3 +1,4 @@
+using Crosswords.Common.Repositories;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -12,6 +13,7 @@ namespace CrosswordsWA
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            builder.Services.AddScoped<ILanguagesRepository, LanguagesRepository>();
 
             await builder.Build().RunAsync();
         }

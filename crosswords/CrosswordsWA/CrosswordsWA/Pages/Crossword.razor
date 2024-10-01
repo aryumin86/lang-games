@@ -1,37 +1,50 @@
 ﻿@page "/crossword"
+@using Crosswords.Common.Entities
+@using Crosswords.Common.Repositories
 @using CrosswordsWA.Models.Crossword
+
+@inject ILanguagesRepository languagesRepository
 
 <PageTitle>Crossword</PageTitle>
 
-<p role="status">Game status: @gameStage</p>
-
 <div class="container">
+    <h3>
+        <span class="badge bg-secondary">
+            Game status: @gameStage
+        </span>
+    </h3>
     <div class="row pb-2">
-        <div class="col-auto flex-row input-group">
-            <button class="btn btn-primary" @onclick="RestartButtonClicked">@restartButtonTitle</button>
-            <select class="form-select w-auto" style="margin-left: 5px;" aria-label="Select size">
-                <option selected>Select size</option>
-                <option value="1">10x10</option>
-                <option value="2">15x15</option>
-                <option value="3">20x20</option>
-                <option value="4">25x25</option>
-                <option value="5">30x30</option>
-            </select>
-            <select class="form-select w-auto" aria-label="Translation mode">
-                <option selected>Translation mode</option>
-                <option value="1">Word</option>
-                <option value="2">Definition</option>
-            </select>
-            <select class="form-select w-auto" aria-label="Words language">
-                <option selected>Words language</option>
-                <option value="1">English</option>
-                <option value="2">Russain</option>
-            </select>
-            <select class="form-select w-auto" aria-label="Translation language">
-                <option selected>Translation language</option>
-                <option value="1">English</option>
-                <option value="2">Russain</option>
-            </select>
+        <div class="col-auto">
+            <div class="flex-row input-group options-container">
+                <button disabled="@restartButtonIsDisabled" class="btn btn-primary" @onclick="RestartButtonClicked">@restartButtonTitle</button>
+                <select class="form-select w-auto" aria-label="Select size">
+                    <option selected>Select size</option>
+                    <option value="1">10x10</option>
+                    <option value="2">15x15</option>
+                    <option value="3">20x20</option>
+                    <option value="4">25x25</option>
+                    <option value="5">30x30</option>
+                </select>
+                <select class="form-select w-auto" aria-label="Translation mode">
+                    <option selected>Translation mode</option>
+                    <option value="1">Word</option>
+                    <option value="2">Definition</option>
+                </select>
+                <select @bind="selectedWordsLanguageId" class="form-select w-auto" aria-label="Words language">
+                    <option value="" selected>Words language</option>
+                    @foreach (var lang in languagesRepository.GetLanguages(l => l.Id != 3)) // not chinese
+                    {
+                        <option value="@lang.Id">@lang.Name</option>
+                    }
+                </select>
+                <select @bind="selectedWordsTranslationLanguageId" class="form-select w-auto" aria-label="Translation language">
+                    <option value="" selected>Translation language</option>
+                    @foreach (var lang in languagesRepository.GetLanguages(_ => true))
+                    {
+                        <option value="@lang.Id">@lang.Name</option>
+                    }
+                </select>
+            </div>
         </div>
     </div>
     <div class="row">
@@ -70,8 +83,13 @@
 
     private string restartButtonTitle = "Start new game";
     private GameStage gameStage = GameStage.NOT_STARTED;
-
     private CharCell[][] charCells = new CharCell[0][];
+    private bool restartButtonIsDisabled =>
+        string.IsNullOrWhiteSpace(selectedWordsLanguageId) ||
+        string.IsNullOrWhiteSpace(selectedWordsTranslationLanguageId);
+
+    private string? selectedWordsLanguageId = null;
+    private string? selectedWordsTranslationLanguageId = null;
 
     private void ShowOptionsClicked()
     {
