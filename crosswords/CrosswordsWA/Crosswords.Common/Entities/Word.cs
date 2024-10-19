@@ -24,5 +24,7 @@ namespace Crosswords.Common.Entities
 
         [Column("difficulty")]
         public int Difficulty { get; set; }
+
+        public IEnumerable<WordDefinition> Definitions { get; set; }
     }
 }

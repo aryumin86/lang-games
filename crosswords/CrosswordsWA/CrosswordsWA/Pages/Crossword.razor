@@ -17,13 +17,13 @@
         <div class="col-auto">
             <div class="flex-row input-group options-container">
                 <button disabled="@restartButtonIsDisabled" class="btn btn-primary" @onclick="RestartButtonClicked">@restartButtonTitle</button>
-                <select class="form-select w-auto" aria-label="Select size">
+                <select @onchange="onSelectSizeSelectValueChanged" class="form-select w-auto" aria-label="Select size">
                     <option selected>Select size</option>
-                    <option value="1">10x10</option>
-                    <option value="2">15x15</option>
-                    <option value="3">20x20</option>
-                    <option value="4">25x25</option>
-                    <option value="5">30x30</option>
+                    <option value="10">10x10</option>
+                    <option value="15">15x15</option>
+                    <option value="20">20x20</option>
+                    <option value="25">25x25</option>
+                    <option value="30">30x30</option>
                 </select>
                 <select class="form-select w-auto" aria-label="Translation mode">
                     <option selected>Translation mode</option>
@@ -90,6 +90,15 @@
 
     private string? selectedWordsLanguageId = null;
     private string? selectedWordsTranslationLanguageId = null;
+    private static int crosswordSize = 15;
+
+    private void onSelectSizeSelectValueChanged(ChangeEventArgs e)
+    {
+        if(!string.IsNullOrWhiteSpace(e.Value?.ToString()))
+        {
+            crosswordSize = int.Parse(e.Value.ToString()!);
+        }
+    }
 
     private void ShowOptionsClicked()
     {
@@ -119,12 +128,12 @@
 
     private static CharCell[][] GetWordsForCrossword()
     {
-        var res = new CharCell[15][];
+        var res = new CharCell[crosswordSize][];
         int fakeWordLastNumber = 0;
-        for(int i = 0; i <= 14; i++)
+        for (int i = 0; i <= crosswordSize-1; i++)
         {
-            res[i] = new CharCell[15];
-            for(var j = 0; j <= 14; j++)
+            res[i] = new CharCell[crosswordSize];
+            for (var j = 0; j <= crosswordSize-1; j++)
             {
                 var wordStart = new Random().Next(16) == 5;
                 if (wordStart){

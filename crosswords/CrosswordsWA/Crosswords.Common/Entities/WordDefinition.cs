@@ -19,6 +19,9 @@ namespace Crosswords.Common.Entities
         [Column("definition")]
         public string? Definition { get; set; }
 
+        [Column("translation")]
+        public string? Translation { get; set; }
+
         [ForeignKey(nameof(LanguageId))]
         [Column("languageid")]
         public Language Language { get; set; }
