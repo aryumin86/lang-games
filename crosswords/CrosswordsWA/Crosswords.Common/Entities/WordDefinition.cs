@@ -13,6 +13,9 @@ namespace Crosswords.Common.Entities
         [Column("id")]
         public int Id { get; set; }
 
+        [ForeignKey(nameof(WordId))]
+        public Word Word { get; set; }
+
         [Column("wordid")]
         public int WordId { get; set; }
 

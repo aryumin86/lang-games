@@ -45,7 +45,7 @@ namespace Crosswords.Common.Repositories
                 {
                    Id = index,
                    Definition = $"definition of {val}",
-                   Language = new Language { Id = 2, Name = "Русски" },
+                   Language = new Language { Id = 2, Name = "Русский" },
                    LanguageId = 2,
                    Translation = val.Item2,
                    WordId = index
