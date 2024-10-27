@@ -239,7 +239,38 @@
 
     private void LocateWord(Word currentWord, Word pairWord, int currentWordLetterIndex, int pairWordLetterIndex)
     {
-        throw new NotImplementedException();
+        var current = usedWords[currentWord.Id];
+        var pairInfo = new UsedWordInfo
+        {
+                StartPosition = current.WordDirection == WordDirection.Horizontal 
+                    ? (current.StartPosition.X + currentWordLetterIndex, current.StartPosition.Y - pairWordLetterIndex)
+                    : (current.StartPosition.X - pairWordLetterIndex, current.StartPosition.Y + currentWordLetterIndex),
+                Word = pairWord,
+                WordDirection = current.WordDirection == WordDirection.Horizontal 
+                    ? WordDirection.Vertical
+                    : WordDirection.Horizontal
+        };
+
+        var pairWordLetters = pairWord.WordStr.ToCharArray();
+        pairInfo.EndPosition = pairInfo.WordDirection == WordDirection.Horizontal
+            ? (pairInfo.StartPosition.X + pairWordLetters.Length, pairInfo.StartPosition.Y)
+            : (pairInfo.StartPosition.X, pairInfo.StartPosition.Y + pairWordLetters.Length);
+
+        List<(int X, int Y, char Letter)> pairWordLettersWithCoordinates = new List<(int X, int Y, char Letter)>();
+        for (int i = 0; i < pairWordLetters.Length; i++)
+        {
+            if (current.WordDirection == WordDirection.Horizontal)
+                pairWordLettersWithCoordinates.Add((pairInfo.StartPosition.X, pairInfo.StartPosition.Y + i, pairWordLetters[i]));
+            else
+                pairWordLettersWithCoordinates.Add((pairInfo.StartPosition.X + i, pairInfo.StartPosition.Y, pairWordLetters[i]));
+        }
+        foreach(var crossedLetterCoord in usedWords.Values.SelectMany(w => w.CrossedLetters))
+        {
+            if (pairWordLettersWithCoordinates.Any(pwc => pwc.X == crossedLetterCoord.X && pwc.Y == crossedLetterCoord.Y)){
+                pairInfo.CrossedLetters.Add(crossedLetterCoord);
+            }
+        }
+
     }
 
     private bool LetterIsCrossedByAnotherWord(
