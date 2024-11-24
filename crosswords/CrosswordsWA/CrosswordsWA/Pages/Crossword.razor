@@ -164,19 +164,21 @@
 
             // TODO add main circle break if no varients found
 
-            // TODO add beak if max words were already added
+            // TODO add break if max words were already added
 
             if (!usedWords.Any())
             {
                 LocateFirstWord(currentWord);
             }
 
-            if (usedWords.ContainsKey(words[allWordsIndex].Id)) continue;
+            // if (usedWords.ContainsKey(words[allWordsIndex].Id)) continue;
 
             // looking for another located word that contains any of the current word's letters.
             // this letter shold not be already in use of another word (words corossing)
             for (int pairWordIndex = 0; pairWordIndex < allWords.Count(); pairWordIndex++)
             {
+                if (usedWords.ContainsKey(words[pairWordIndex].Id)) continue;
+
                 var pairWord = allWords[pairWordIndex];
                 var pairWordLetters = pairWord.WordStr.ToCharArray();
 
@@ -186,7 +188,9 @@
                     for (int pairWordLetterIndex = 0; pairWordLetterIndex < pairWordLetters.Length; pairWordLetterIndex++)
                     {
                         if (currentWordLetters[currentWordLetterIndex] == pairWordLetters[pairWordLetterIndex] 
-                            && !LetterIsCrossedByAnotherWord(currentWord, currentWordLetterIndex)
+                            && !usedWords.ContainsKey(pairWord.Id)
+                            && !LetterIsCrossedByAnotherWord(currentWord, currentWordLetterIndex) 
+                            && !LetterIsCrossedByAnotherWord(pairWord, pairWordLetterIndex) // may be there is no need to check it
                             && WordCanBeLocatedHere(currentWord, pairWord, currentWordLetterIndex, pairWordLetterIndex))
                         {
                             LocateWord(currentWord, pairWord, currentWordLetterIndex, pairWordLetterIndex);
@@ -218,6 +222,54 @@
         //         };
         //     }
         // }
+
+        var wordNumberInList = 1;
+        for(int i = 0; i < size; i++)
+        {
+            res[i] = new CharCell[size];
+            //todo add empty (black) cells here too
+            for(int j = 0; j < size; j++)
+            {
+                
+            }
+        }
+
+        foreach(var word in usedWords.Select(x => x.Value))
+        {
+            if(word.WordDirection == WordDirection.Horizontal)
+            {
+                var wordStart = true;
+                for(int i = word.StartPosition.X; i < word.EndPosition.X; i++)
+                {
+                    var charCell = new CharCell
+                    {
+                        ContainsLetter = true,
+                        WordStart = wordStart,
+                            RealLetter = word.Word.WordStr.ToCharArray()[i - word.StartPosition.X],
+                        WordNumberInList = wordNumberInList++
+                    };
+                    wordStart = false;
+                    res[word.StartPosition.X+i][word.StartPosition.Y] = charCell;
+                }
+            }
+            else
+            {
+                var wordStart = true;
+                for (int i = word.StartPosition.Y; i < word.EndPosition.Y; i++)
+                {
+                    var charCell = new CharCell
+                        {
+                            ContainsLetter = true,
+                            WordStart = wordStart,
+                            RealLetter = word.Word.WordStr.ToCharArray()[i - word.StartPosition.Y],
+                            WordNumberInList = wordNumberInList++
+                        };
+                    wordStart = false;
+                    res[word.StartPosition.X][word.StartPosition.Y+i] = charCell;
+                }
+            }
+        }
+
         return res;
     }
 
@@ -271,16 +323,18 @@
             }
         }
 
+        usedWords.Add(pairInfo.Word.Id, pairInfo);
     }
 
     private bool LetterIsCrossedByAnotherWord(
-        Word currentWord, int currentWordLetterIndex)
+        Word word, int letterIndex)
     {
-        var currentUsedWord = usedWords[currentWord.Id];
-        var letter = currentWord.WordStr.ToCharArray()[currentWordLetterIndex];
+        if (!usedWords.ContainsKey(word.Id)) return false;
+        var currentUsedWord = usedWords[word.Id];
+        var letter = word.WordStr.ToCharArray()[letterIndex];
         (int X, int Y, char Letter) letterCoordinates = currentUsedWord.WordDirection == WordDirection.Horizontal
-            ? (currentUsedWord.StartPosition.X + currentWordLetterIndex, currentUsedWord.StartPosition.Y, letter)
-            : (currentUsedWord.StartPosition.X, currentUsedWord.StartPosition.Y + currentWordLetterIndex, letter);
+            ? (currentUsedWord.StartPosition.X + letterIndex, currentUsedWord.StartPosition.Y, letter)
+            : (currentUsedWord.StartPosition.X, currentUsedWord.StartPosition.Y + letterIndex, letter);
 
         return currentUsedWord.CrossedLetters.Any(l => l == letterCoordinates);
     }
@@ -288,6 +342,7 @@
     private bool WordCanBeLocatedHere(
         Word currentWord, Word pairWord, int currentWordLetterIndex, int pairWordLetterIndex)
     {
+        //var currentUsedWord = usedWords[currentWord.Id];
         var currentUsedWord = usedWords[currentWord.Id];
         (int X, int Y) letterCoordinates = currentUsedWord.WordDirection == WordDirection.Horizontal
             ? (currentUsedWord.StartPosition.X + currentWordLetterIndex, currentUsedWord.StartPosition.Y)
