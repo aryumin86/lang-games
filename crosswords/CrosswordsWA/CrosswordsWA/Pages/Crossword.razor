@@ -230,7 +230,7 @@
             //todo add empty (black) cells here too
             for(int j = 0; j < size; j++)
             {
-                
+
             }
         }
 
@@ -239,29 +239,29 @@
             if(word.WordDirection == WordDirection.Horizontal)
             {
                 var wordStart = true;
-                for(int i = word.StartPosition.X; i < word.EndPosition.X; i++)
+                for (int i = 0 /* word.StartPosition.X */; i + word.StartPosition.X < word.EndPosition.X; i++)
                 {
                     var charCell = new CharCell
                     {
                         ContainsLetter = true,
                         WordStart = wordStart,
-                            RealLetter = word.Word.WordStr.ToCharArray()[i - word.StartPosition.X],
+                            RealLetter = word.Word.WordStr.ToCharArray()[i /* - word.StartPosition.X */],
                         WordNumberInList = wordNumberInList++
                     };
                     wordStart = false;
-                    res[word.StartPosition.X+i][word.StartPosition.Y] = charCell;
+                    res[word.StartPosition.X+i][word.StartPosition.Y] = charCell;                    
                 }
             }
             else
             {
                 var wordStart = true;
-                for (int i = word.StartPosition.Y; i < word.EndPosition.Y; i++)
+                for (int i = /* word.StartPosition.Y */ 0; i + word.StartPosition.Y < word.EndPosition.Y; i++)
                 {
                     var charCell = new CharCell
                         {
                             ContainsLetter = true,
                             WordStart = wordStart,
-                            RealLetter = word.Word.WordStr.ToCharArray()[i - word.StartPosition.Y],
+                            RealLetter = word.Word.WordStr.ToCharArray()[i /* - word.StartPosition.Y */],
                             WordNumberInList = wordNumberInList++
                         };
                     wordStart = false;
@@ -276,7 +276,8 @@
     private void LocateFirstWord(Word word)
     {
         var wordDirection = new Random().Next(1, 2) == 1 ? WordDirection.Horizontal : WordDirection.Vertical;
-        var xAndStartPosition = int.Parse(crosswordSize) - word.WordStr.Length / 2;
+        //var xAndStartPosition = int.Parse(crosswordSize) - word.WordStr.Length / 2; // try 0
+        var xAndStartPosition = 6; // try 0
         var wInfo = new UsedWordInfo
         {
             Word = word,
